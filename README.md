@@ -3,7 +3,7 @@
 ## วิธีติดตั้งและใช้งาน Web Application
 
 ### 1. เตรียมสภาพแวดล้อม
-- แนะนำให้ใช้ Python 3.8 ขึ้นไป (แนะนำ Python 3.10)
+- แนะนำให้ใช้ Python 3.8 ขึ้นไป (แนะนำ Python 3.10 หรือ Python 3.12)
 - แนะนำให้สร้าง virtual environment ก่อนติดตั้ง dependencies
 
 ```bash
@@ -20,7 +20,7 @@ pip install -r requirements.txt
 ```
 
 ### 3. ตรวจสอบไฟล์โมเดล
-- ต้องมีไฟล์โมเดล `model/model.h5` และไฟล์โครงสร้างโมเดล `model/Model_Architecture.json` อยู่ในโฟลเดอร์ `model/`
+- ต้องมีไฟล์โมเดล `model/model.h5` อยู่ในโฟลเดอร์ `model/`
 - หากไม่มีไฟล์เหล่านี้ จะไม่สามารถใช้งานระบบทำนายได้
 
 ### 4. รันเซิร์ฟเวอร์
@@ -73,6 +73,3 @@ ECG-Arrhythmia-Classification/
 - **ImportError / ModuleNotFoundError**: ให้ตรวจสอบว่าได้ติดตั้ง dependencies ตาม `requirements.txt` แล้ว
 - **Model not found**: ตรวจสอบว่าไฟล์ `model.h5` อยู่ในโฟลเดอร์ `model/`
 - **CSV format error**: ตรวจสอบว่าไฟล์ CSV มี 2 แถว และแถวที่สองมี 187 ค่า
-
----
-หากมีคำถามหรือปัญหาเพิ่มเติม สามารถติดต่อผู้พัฒนาได้ตามช่องทางที่ระบุ
