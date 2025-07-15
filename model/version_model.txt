@@ -1,0 +1,3 @@
+Name model : ECG Phase2 02
+Data each class : 20000
+Epochs : 30
