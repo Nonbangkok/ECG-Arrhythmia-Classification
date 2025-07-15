@@ -1,11 +1,19 @@
 {
   "version": 2,
   "builds": [
-    { "src": "server/app.py", "use": "@vercel/python" },
-    { "src": "public/**/*", "use": "@vercel/static" }
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python"
+    }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "server/app.py" },
-    { "src": "/(.*)", "dest": "public/index.html" }
+    {
+      "src": "/(predict|plot|data/.*)",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/$1"
+    }
   ]
 }
