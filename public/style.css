@@ -127,6 +127,36 @@ input[type="file"] {
     margin-bottom: 0;
     box-shadow: 0 1px 4px rgba(39, 174, 96, 0.07);
 }
+/* Floating Action Button for bottom right */
+.fab-bottom-right {
+    position: fixed;
+    right: 32px;
+    bottom: 32px;
+    z-index: 1000;
+    padding: 14px 32px;
+    border-radius: 32px;
+    background: linear-gradient(90deg, #3498db 0%, #6dd5fa 100%);
+    color: #fff;
+    font-size: 1.08rem;
+    font-weight: 600;
+    box-shadow: 0 4px 16px rgba(52, 152, 219, 0.18);
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+    outline: none;
+}
+.fab-bottom-right:hover {
+    background: linear-gradient(90deg, #6dd5fa 0%, #3498db 100%);
+    transform: translateY(-2px) scale(1.04);
+}
+.fab-secondary {
+    background: linear-gradient(90deg, #b2bec3 0%, #636e72 100%);
+    color: #fff;
+    margin-top: 12px;
+}
+.fab-secondary:hover {
+    background: linear-gradient(90deg, #636e72 0%, #b2bec3 100%);
+}
 @media (max-width: 600px) {
     .container {
         padding: 16px 4vw 18px 4vw;
