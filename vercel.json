@@ -27,10 +27,5 @@
       "src": "/(.*)",
       "dest": "server/app.py"
     }
-  ],
-  "functions": {
-    "server/app.py": {
-      "runtime": "python3.12"
-    }
-  }
+  ]
 }
