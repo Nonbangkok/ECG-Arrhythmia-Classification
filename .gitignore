@@ -1,0 +1,5 @@
+# Marcos
+*.DS_Store
+*.vscode
+.venv/
+model/train.ipynb

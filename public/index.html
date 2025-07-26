@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECG Arrhythmia Demo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>ECG Arrhythmia Classification Demo</h1>
+        <div class="sample-selector">
+            <label for="sampleSelect">Select ECG Sample:</label>
+            <select id="sampleSelect">
+                <option value="" selected disabled>Please select...</option>
+            </select>
+        </div>
+        <div class="upload-section">
+            <label for="csvInput" class="upload-btn">Choose CSV File</label>
+            <input type="file" id="csvInput" accept=".csv" />
+        </div>
+        <div class="csv-format-example">
+            <b>CSV Format Example:</b>
+            <pre style="background:#f4f4f4;padding:8px;border-radius:6px;overflow-x:auto;">
+0,1,2,3,4,5,...,185,186
+0.12,0.15,0.18,...,0.22,0.19
+            </pre>
+            <small>First row: index (can be any numbers)<br>Second row: 187 ECG values (float or int, separated by comma)</small>
+        </div>
+        <div class="ecg-image">
+            <img id="ecgPlotImg" src="" alt="ECG Plot" style="display:none;" />
+        </div>
+        <button id="predictBtn" disabled>Predict</button>
+        <div class="result" id="result"></div>
+    </div>
+    <button id="licenseBtn" class="fab-bottom-right" onclick="window.location.href='license.html'">View License Agreement</button>
+    <script src="script.js"></script>
+</body>
+</html>
