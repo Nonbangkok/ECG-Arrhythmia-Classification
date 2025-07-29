@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, send_from_directory
 import numpy as np
-# import keras
+import keras
 import os
 import matplotlib
 import matplotlib.pyplot as plt
@@ -11,9 +11,9 @@ app = Flask(__name__)
 
 matplotlib.use('Agg')
 
-# MODEL_PATH = os.path.join(os.path.dirname(__file__), '../model/model.h5')
-# model = keras.models.load_model(MODEL_PATH)
-model = None
+MODEL_PATH = os.path.join(os.path.dirname(__file__), '../model/model.h5')
+model = keras.models.load_model(MODEL_PATH)
+# model = None
 
 @app.route('/')
 def index():
@@ -40,11 +40,11 @@ def predict():
     if len(input_array.shape) == 1:
         input_array = input_array.reshape(1, -1, 1)
 
-    # prediction = model.predict(input_array)
-    # print("value", prediction)
-    # result = prediction.tolist()
+    prediction = model.predict(input_array)
+    print("value", prediction)
+    result = prediction.tolist()
+    # result = None
     
-    result = None
     if model is None:
         return jsonify({'error': 'Model not loaded'}), 400
         
