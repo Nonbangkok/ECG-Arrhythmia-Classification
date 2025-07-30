@@ -199,7 +199,7 @@
         tbody.innerHTML = '';
         data.forEach((row, i) => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${i+1}</td><td>${row.timestamp}</td><td>${classLabel(row.model_class)}</td><td>${classLabel(row.doctor_class)}</td><td><button class='show-graph-btn' data-row='${i}'>Show Graph</button></td>`;
+            tr.innerHTML = `<td>${i+1}</td><td>${row.timestamp}</td><td>${classLabel(row.model_class)}</td><td>${classLabel(row.doctor_class)}</td><td><button class='show-graph-btn' data-row='${i}'>Show Graph</button> <button class='edit-btn' data-row='${i}'>Edit</button> <button class='delete-btn' data-row='${i}'>Delete</button></td>`;
             tbody.appendChild(tr);
             // Row for graph (hidden by default)
             const graphTr = document.createElement('tr');
@@ -218,6 +218,21 @@
         document.querySelectorAll('.close-graph-btn').forEach((btn, idx) => {
             btn.onclick = function() {
                 hideGraphRow(idx);
+            };
+        });
+        // Add event listeners for edit/delete
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.onclick = function() {
+                const idx = parseInt(btn.getAttribute('data-row'));
+                showEditRow(idx, data[idx]);
+            };
+        });
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.onclick = function() {
+                const idx = parseInt(btn.getAttribute('data-row'));
+                if(confirm('Are you sure you want to delete this row?')) {
+                    deleteRow(idx, data[idx]);
+                }
             };
         });
     }
@@ -265,6 +280,61 @@
             chartInstances[idx] = null;
         }
         if(expandedRow === idx) expandedRow = null;
+    }
+    function showEditRow(idx, rowData) {
+        const tbody = document.querySelector('#summaryTable tbody');
+        const tr = tbody.children[idx*2];
+        const modelOptions = [0,1,2,3].map(j => `<option value='${j}'${rowData.model_class===j?' selected':''}>${classLabel(j)}</option>`).join('');
+        const doctorOptions = [0,1,2,3].map(j => `<option value='${j}'${rowData.doctor_class===j?' selected':''}>${classLabel(j)}</option>`).join('');
+        tr.innerHTML = `<td>${idx+1}</td><td>${rowData.timestamp}</td><td><select id='editModel${idx}'>${modelOptions}</select></td><td><select id='editDoctor${idx}'>${doctorOptions}</select></td><td><button class='save-edit-btn' data-row='${idx}'>Save</button> <button class='cancel-edit-btn' data-row='${idx}'>Cancel</button></td>`;
+        document.querySelector(`.save-edit-btn[data-row='${idx}']`).onclick = function() {
+            const newModel = parseInt(document.getElementById('editModel'+idx).value);
+            const newDoctor = parseInt(document.getElementById('editDoctor'+idx).value);
+            updateRow(idx, rowData, newModel, newDoctor);
+        };
+        document.querySelector(`.cancel-edit-btn[data-row='${idx}']`).onclick = function() {
+            renderTable(filteredData);
+        };
+    }
+    function updateRow(idx, rowData, newModel, newDoctor) {
+        fetch('/dashboard_update_row', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({
+                timestamp: rowData.timestamp,
+                input_data: rowData.input_data,
+                model_class: newModel,
+                doctor_class: newDoctor
+            })
+        }).then(res=>res.json()).then(res=>{
+            if(res.success) {
+                filteredData[idx].model_class = newModel;
+                filteredData[idx].doctor_class = newDoctor;
+                renderTable(filteredData);
+                renderCharts(filteredData);
+            } else {
+                alert('Update failed');
+                renderTable(filteredData);
+            }
+        });
+    }
+    function deleteRow(idx, rowData) {
+        fetch('/dashboard_delete_row', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({
+                timestamp: rowData.timestamp,
+                input_data: rowData.input_data
+            })
+        }).then(res=>res.json()).then(res=>{
+            if(res.success) {
+                filteredData.splice(idx,1);
+                renderTable(filteredData);
+                renderCharts(filteredData);
+            } else {
+                alert('Delete failed');
+            }
+        });
     }
     document.getElementById('filterClass').onchange = document.getElementById('filterSearch').oninput = document.getElementById('filterDate').onchange = function() {
         filteredData = filterData();
