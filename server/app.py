@@ -6,6 +6,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 import io
 import base64
+import csv
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -86,6 +88,74 @@ def plot_ecg():
     img_base64 = base64.b64encode(buf.read()).decode('utf-8')
     img_uri = f'data:image/png;base64,{img_base64}'
     return jsonify({'image': img_uri})
+
+@app.route('/save_classification', methods=['POST'])
+def save_classification():
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+        
+        input_data = data.get('input_data')
+        model_prediction = data.get('model_prediction')
+        doctor_classification = data.get('doctor_classification')
+        
+        if not all([input_data, model_prediction, doctor_classification is not None]):
+            return jsonify({'success': False, 'error': 'Missing required data'}), 400
+        
+        # Create database directory if it doesn't exist
+        database_dir = os.path.join(os.path.dirname(__file__), '../database')
+        os.makedirs(database_dir, exist_ok=True)
+        
+        # Prepare data for CSV
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Get model prediction details
+        model_pred = model_prediction.get('predicted', [{}])[0]
+        model_class = model_pred.get('class_index', -1)
+        model_label = model_pred.get('label', 'Unknown')
+        model_probabilities = model_pred.get('probabilities', [])
+        
+        # Class labels for doctor classification
+        class_labels = [
+            'Class 0 : Normal',
+            'Class 1 : Supraventricular Premature Beat',
+            'Class 2 : Premature Ventricular Contraction',
+            'Class 3 : Unclassifiable Beat'
+        ]
+        doctor_label = class_labels[doctor_classification] if 0 <= doctor_classification < 4 else 'Unknown'
+        
+        # CSV file path
+        csv_file = os.path.join(database_dir, 'classifications.csv')
+        
+        # Check if file exists to write header
+        file_exists = os.path.exists(csv_file)
+        
+        with open(csv_file, 'a', newline='', encoding='utf-8') as csvfile:
+            writer = csv.writer(csvfile)
+            
+            # Write header if file is new
+            if not file_exists:
+                header = ['Timestamp', 'Input_Data', 'Model_Prediction_Class', 'Model_Prediction_Label', 
+                         'Model_Probabilities', 'Doctor_Classification_Class', 'Doctor_Classification_Label']
+                writer.writerow(header)
+            
+            # Write data row
+            row = [
+                timestamp,
+                ','.join(map(str, input_data)),
+                model_class,
+                model_label,
+                ','.join(map(str, model_probabilities)),
+                doctor_classification,
+                doctor_label
+            ]
+            writer.writerow(row)
+        
+        return jsonify({'success': True, 'message': 'Classification saved successfully'})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':
     # app.run(debug=True)
