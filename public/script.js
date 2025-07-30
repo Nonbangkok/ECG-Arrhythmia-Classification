@@ -22,6 +22,8 @@ const ecgPlotImg = document.getElementById('ecgPlotImg');
 const predictBtn = document.getElementById('predictBtn');
 const resultDiv = document.getElementById('result');
 const csvInput = document.getElementById('csvInput');
+const doctorClassification = document.getElementById('doctorClassification');
+const confirmBtn = document.getElementById('confirmBtn');
 
 samples.forEach((s, i) => {
   const opt = document.createElement('option');
@@ -32,6 +34,8 @@ samples.forEach((s, i) => {
 
 let selectedSample = null;
 let inputData = null;
+let predictionResult = null;
+let selectedDoctorClass = null;
 
 function showResult(html, isError = false) {
   resultDiv.innerHTML = html;
@@ -44,19 +48,31 @@ function hideResult() {
   resultDiv.style.display = 'none';
 }
 
+function hideDoctorClassification() {
+  doctorClassification.style.display = 'none';
+  selectedDoctorClass = null;
+  document.querySelectorAll('.class-btn').forEach(btn => {
+    btn.classList.remove('selected');
+  });
+  confirmBtn.disabled = true;
+}
+
 sampleSelect.addEventListener('change', async (e) => {
   const idx = e.target.value;
   if (idx === "") {
     ecgPlotImg.style.display = 'none';
     predictBtn.disabled = true;
     hideResult();
+    hideDoctorClassification();
     selectedSample = null;
     inputData = null;
+    predictionResult = null;
     return;
   }
   selectedSample = samples[idx];
   predictBtn.disabled = false;
   hideResult();
+  hideDoctorClassification();
   inputData = await loadSampleFromCSV(selectedSample.csv, selectedSample.row);
 
   if (inputData) {
@@ -92,6 +108,7 @@ csvInput.addEventListener('change', async (e) => {
       showResult('CSV file must have at least 2 rows.', true);
       ecgPlotImg.style.display = 'none';
       predictBtn.disabled = true;
+      hideDoctorClassification();
       return;
     }
 
@@ -100,11 +117,13 @@ csvInput.addEventListener('change', async (e) => {
       showResult('Second row must have 187 numeric values.', true);
       ecgPlotImg.style.display = 'none';
       predictBtn.disabled = true;
+      hideDoctorClassification();
       return;
     }
     inputData = row;
     sampleSelect.value = "";
     predictBtn.disabled = false;
+    hideDoctorClassification();
 
     try {
       const res = await fetch('/plot', {
@@ -139,11 +158,26 @@ predictBtn.addEventListener('click', async () => {
     const data = await res.json();
     if (data.predicted && data.predicted.length > 0) {
       const pred = data.predicted[0];
+      predictionResult = data;
 
       const maxIdx = pred.class_index;
       const percent = (pred.probabilities[maxIdx] * 100).toFixed(2) + '%';
       let html = `<b>Prediction:</b> ${pred.label}<br/><b>Probability:</b> <b>${percent}</b>`;
+      // เพิ่มปุ่ม More Information เฉพาะ class 0,1,2
+      if (maxIdx === 0 || maxIdx === 1 || maxIdx === 2) {
+        const infoPages = ['class0.html', 'class1.html', 'class2.html'];
+        html += `<br><button id="moreInfoBtn" style="margin-top:10px;padding:8px 18px;font-size:1rem;background:#007bff;color:#fff;border:none;border-radius:6px;cursor:pointer;">More Information</button>`;
+        setTimeout(() => {
+          const btn = document.getElementById('moreInfoBtn');
+          if (btn) {
+            btn.onclick = () => window.open(infoPages[maxIdx], '_blank');
+          }
+        }, 0);
+      }
       showResult(html);
+      
+      // Show doctor classification section
+      doctorClassification.style.display = 'block';
     } else {
       showResult('Error: ' + (data.error || 'Unknown error'), true);
     }
@@ -152,6 +186,49 @@ predictBtn.addEventListener('click', async () => {
   }
 });
 
+// Doctor classification button handlers
+document.querySelectorAll('.class-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    // Remove selected class from all buttons
+    document.querySelectorAll('.class-btn').forEach(b => b.classList.remove('selected'));
+    // Add selected class to clicked button
+    btn.classList.add('selected');
+    selectedDoctorClass = parseInt(btn.getAttribute('data-class'));
+    confirmBtn.disabled = false;
+  });
+});
+
+// Confirm button handler
+confirmBtn.addEventListener('click', async () => {
+  if (!inputData || !predictionResult || selectedDoctorClass === null) {
+    showResult('Please select a classification first.', true);
+    return;
+  }
+
+  try {
+    const saveData = {
+      input_data: inputData,
+      model_prediction: predictionResult,
+      doctor_classification: selectedDoctorClass
+    };
+
+    const res = await fetch('/save_classification', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(saveData)
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      showResult('Data saved successfully!', false);
+      hideDoctorClassification();
+    } else {
+      showResult('Error saving data: ' + (data.error || 'Unknown error'), true);
+    }
+  } catch (err) {
+    showResult('Error: ' + err.message, true);
+  }
+});
 
 async function loadSampleFromCSV(csvPath, rowNum) {
   const res = await fetch(csvPath);
@@ -163,4 +240,27 @@ async function loadSampleFromCSV(csvPath, rowNum) {
 }
 
 hideResult();
+hideDoctorClassification();
+
+// Info icon click handlers
+document.querySelectorAll('.info-icon').forEach(icon => {
+  icon.addEventListener('click', (e) => {
+    e.stopPropagation(); // Prevent button click
+    const classNum = icon.getAttribute('data-class');
+    openClassInfo(classNum);
+  });
+});
+
+// Function to open class information
+function openClassInfo(classNum) {
+  const classInfo = {
+    '0': 'class0.html',
+    '1': 'class1.html',
+    '2': 'class2.html'
+  };
+  const page = classInfo[classNum];
+  if (page) {
+    window.open(page, '_blank');
+  }
+}
 
