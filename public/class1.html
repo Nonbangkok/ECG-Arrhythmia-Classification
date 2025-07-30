@@ -5,6 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class 1: Supraventricular Premature Beat</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f8faff 0%, #e3f2fd 50%, #bbdefb 100%);
+        }
+        .container {
+            max-width: 700px;
+            margin: 48px auto 0 auto;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(52, 152, 219, 0.12);
+            padding: 40px 32px 32px 32px;
+            border: 1px solid rgba(52, 152, 219, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 0.8s ease;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        h1 {
+            text-align: center;
+            color: #1a365d;
+            margin-bottom: 32px;
+            font-weight: 700;
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        p {
+            color: #2c3e50;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        ul {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 12px;
+            padding: 20px 30px;
+            margin: 20px 0;
+            border-left: 4px solid #3b82f6;
+        }
+        li {
+            color: #1e40af;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 24px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.25);
+        }
+        .back-link:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35);
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -16,7 +88,7 @@
             <li>Rarely require treatment unless symptomatic or frequent</li>
         </ul>
         <p>Frequent supraventricular premature beats may indicate underlying heart or metabolic conditions and should be evaluated by a physician.</p>
-        <a href="index.html">&larr; Back to main page</a>
+        <a href="index.html" class="back-link">&larr; Back to main page</a>
     </div>
 </body>
 </html> 
