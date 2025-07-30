@@ -1,29 +1,48 @@
 #!/bin/bash
 
-echo "🔄 Restarting Flask Backend..."
+echo "🔄 รีสตาร์ท Flask Backend"
+echo "=========================="
 
-# Kill existing Flask process
-pkill -f "python app.py" 2>/dev/null || echo "No existing Flask process found"
+# หยุด Flask process ที่ทำงานอยู่
+echo "🛑 หยุด Flask process ที่ทำงานอยู่..."
+pkill -f "python.*app.py" 2>/dev/null
 
-# Wait a moment
+# รอสักครู่
 sleep 2
 
-# Start Flask backend
-echo "📡 Starting Flask Backend..."
+# ตรวจสอบว่า virtual environment มีอยู่หรือไม่
+if [ ! -d "venv" ]; then
+    echo "❌ ไม่พบ virtual environment กรุณารัน setup-venv.sh ก่อน"
+    exit 1
+fi
+
+# เปิดใช้งาน virtual environment
+echo "🔧 เปิดใช้งาน virtual environment..."
+source venv/bin/activate
+
+# เริ่มต้น Flask backend ใหม่
+echo "🐍 เริ่มต้น Flask backend ใหม่..."
 cd server
-/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12 /Users/nonbangkok/Documents/VS_code/ECG-Arrhythmia-Classification/server/app.py &
+python app.py &
 FLASK_PID=$!
+cd ..
 
-echo "✅ Flask Backend started with PID: $FLASK_PID"
-echo "🌐 Flask Backend: http://localhost:5000"
-
-# Wait for Flask to start
-sleep 3
-
-# Test Flask backend
-echo "🧪 Testing Flask Backend..."
-curl -s http://localhost:5000/ > /dev/null && echo "✅ Flask Backend is running!" || echo "❌ Flask Backend failed to start"
-
+echo "✅ Flask backend เริ่มต้นใหม่เรียบร้อย (PID: $FLASK_PID)"
+echo "🌐 เข้าถึงได้ที่: http://localhost:5000"
 echo ""
-echo "Press Ctrl+C to stop Flask Backend"
-wait $FLASK_PID 
+echo "กด Ctrl+C เพื่อหยุด"
+
+# ฟังก์ชันสำหรับหยุดเซิร์ฟเวอร์
+cleanup() {
+    echo ""
+    echo "🛑 หยุด Flask backend..."
+    kill $FLASK_PID 2>/dev/null
+    echo "✅ หยุด Flask backend เรียบร้อย"
+    exit 0
+}
+
+# จับสัญญาณ Ctrl+C
+trap cleanup SIGINT
+
+# รอให้เซิร์ฟเวอร์ทำงาน
+wait 

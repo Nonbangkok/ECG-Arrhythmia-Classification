@@ -1,212 +1,263 @@
-# 🚀 Development Guide
+# 🛠️ คู่มือการพัฒนา - ระบบจำแนกประเภทคลื่นไฟฟ้าหัวใจ
 
-## **Quick Start**
+## 🚀 **การเริ่มต้นอย่างรวดเร็ว**
 
-### **Option 1: Use Start Script (Recommended)**
+### **สำหรับ macOS/Linux:**
 ```bash
+# ตั้งค่า virtual environment
+./setup-venv.sh
+
+# เริ่มต้นเซิร์ฟเวอร์พัฒนา
 ./start-dev.sh
 ```
 
-### **Option 2: Manual Start**
+### **สำหรับ Windows:**
+```cmd
+# ตั้งค่า virtual environment
+setup-venv.bat
 
-#### **Terminal 1 - Flask Backend:**
+# เริ่มต้นเซิร์ฟเวอร์พัฒนา
+start-dev.bat
+```
+
+## 📁 **โครงสร้างไฟล์**
+
+```
+ECG-Arrhythmia-Classification/
+├── data/                    # ข้อมูลตัวอย่างคลื่นไฟฟ้าหัวใจ
+│   ├── csv/                # ไฟล์ CSV ตัวอย่าง
+│   ├── mismatch/           # ข้อมูลที่ไม่ตรงกัน
+│   └── old/                # ข้อมูลเก่า
+├── database/               # ฐานข้อมูล
+│   └── classifications.csv # ข้อมูลการจำแนกประเภท
+├── model/                  # โมเดล AI
+│   ├── model.h5           # โมเดลที่เทรนแล้ว
+│   └── Model_Architecture.json # โครงสร้างโมเดล
+├── server/                 # Backend (Flask)
+│   └── app.py             # API server
+├── src/                    # Frontend (Next.js)
+│   ├── app/               # หน้าเว็บ
+│   │   ├── page.tsx       # หน้าหลัก
+│   │   ├── dashboard/     # แดชบอร์ด
+│   │   └── license/       # หน้าใบอนุญาต
+│   ├── components/        # React components
+│   │   ├── ECGChart.tsx   # กราฟคลื่นไฟฟ้าหัวใจ
+│   │   ├── DashboardChart.tsx # กราฟแดชบอร์ด
+│   │   └── FloatingButton.tsx # ปุ่มลอย
+│   ├── lib/               # utilities
+│   │   └── api.ts         # API client
+│   └── types/             # TypeScript types
+│       └── index.ts       # type definitions
+├── scripts/                # Scripts สำหรับ platform ต่างๆ
+├── requirements.txt        # Python dependencies
+├── package.json           # Node.js dependencies
+└── README.md              # คู่มือการใช้งาน
+```
+
+## 🔧 **API Endpoints**
+
+### **Backend (Flask) - http://localhost:5000**
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/predict` | จำแนกประเภทคลื่นไฟฟ้าหัวใจ |
+| `POST` | `/plot` | สร้างกราฟคลื่นไฟฟ้าหัวใจ |
+| `GET` | `/data/<path>` | ดึงข้อมูลไฟล์ |
+| `GET` | `/dashboard_data` | ดึงข้อมูลแดชบอร์ด |
+| `POST` | `/save_classification` | บันทึกการจำแนกประเภท |
+| `POST` | `/dashboard_update_row` | อัปเดตข้อมูล |
+| `POST` | `/dashboard_delete_row` | ลบข้อมูล |
+
+### **Frontend (Next.js) - http://localhost:3000**
+
+| Route | Description |
+|-------|-------------|
+| `/` | หน้าหลัก |
+| `/dashboard` | แดชบอร์ด |
+| `/license` | หน้าใบอนุญาต |
+
+## 🐛 **การแก้ไขปัญหา**
+
+### **ปัญหาที่พบบ่อย:**
+
+#### **1. "Error loading sample data"**
 ```bash
-cd server
-python app.py
+# ตรวจสอบว่า Flask backend ทำงานอยู่หรือไม่
+curl http://localhost:5000/
+
+# รีสตาร์ท Flask backend
+./restart-flask.sh  # macOS/Linux
+restart-flask.bat   # Windows
 ```
 
-#### **Terminal 2 - Next.js Frontend:**
+#### **2. "ModuleNotFoundError: No module named 'distutils'"**
 ```bash
-npm run dev
+# อัปเกรด setuptools
+pip install --upgrade setuptools
+
+# หรือสร้าง virtual environment ใหม่
+./setup-venv.sh  # macOS/Linux
+setup-venv.bat   # Windows
 ```
 
-## **🔧 Troubleshooting**
+#### **3. "Expected 187 values, got 186"**
+- ตรวจสอบว่าไฟล์ CSV มี 187 ค่า
+- ตรวจสอบการ parse ข้อมูลใน `src/lib/api.ts`
 
-### **"Error loading sample data"**
+#### **4. "404 This page could not be found"**
+- ตรวจสอบว่าไฟล์ `src/app/page.tsx` มีอยู่
+- รีสตาร์ท Next.js server
 
-**Cause:** Flask backend ไม่ได้รัน หรือ API endpoint ไม่ถูกต้อง
+#### **5. "Network Error"**
+- ตรวจสอบ CORS ใน Flask backend
+- ตรวจสอบว่า Flask backend ทำงานที่ port 5000
 
-**Solution:**
-1. ตรวจสอบ Flask backend รันอยู่:
-   ```bash
-   curl http://localhost:5000/
-   ```
+### **การ Debug:**
 
-2. ตรวจสอบ CSV files:
-   ```bash
-   curl http://localhost:5000/data/csv/c0.csv
-   ```
-
-3. ตรวจสอบ logs ใน browser console
-
-### **"Model not loaded"**
-
-**Cause:** Keras model ไม่สามารถโหลดได้
-
-**Solution:**
-1. ตรวจสอบ model file:
-   ```bash
-   ls -la model/
-   ```
-
-2. ตรวจสอบ Python dependencies:
-   ```bash
-   pip install keras tensorflow
-   ```
-
-### **"Port already in use"**
-
-**Solution:**
+#### **Frontend Debug:**
 ```bash
-# Kill process on port 5000
-lsof -ti:5000 | xargs kill -9
-
-# Kill process on port 3000
-lsof -ti:3000 | xargs kill -9
-```
-
-## **📁 File Structure**
-
-```
-├── server/              # Flask Backend
-│   └── app.py          # Main Flask app
-├── src/                 # Next.js Frontend
-│   ├── app/            # Pages
-│   ├── components/     # React components
-│   ├── lib/           # Utilities
-│   └── types/         # TypeScript types
-├── data/               # CSV files
-├── model/              # Keras model
-└── public/             # Static files (old version)
-```
-
-## **🔗 API Endpoints**
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/` | GET | Serve static files |
-| `/data/<path>` | GET | Serve CSV files |
-| `/predict` | POST | ECG classification |
-| `/plot` | POST | Generate ECG chart |
-| `/save_classification` | POST | Save classification |
-| `/dashboard_data` | GET | Get dashboard data |
-| `/dashboard_update_row` | POST | Update record |
-| `/dashboard_delete_row` | POST | Delete record |
-
-## **🐛 Debug Mode**
-
-### **Flask Debug:**
-```python
-# ใน server/app.py
-app.run(debug=True, host='0.0.0.0', port=5000)
-```
-
-### **Next.js Debug:**
-```bash
-# เปิด browser developer tools
+# เปิด Developer Tools ในเบราว์เซอร์
 # ดู Console และ Network tabs
 ```
 
-## **📊 Testing**
-
-### **Test Flask Backend:**
+#### **Backend Debug:**
 ```bash
-# Test CSV loading
-curl http://localhost:5000/data/csv/c0.csv
+# เพิ่ม print statements ใน app.py
+# ดู logs ใน terminal
+```
 
-# Test prediction
+## 🔄 **การรีสตาร์ทเซิร์ฟเวอร์**
+
+### **รีสตาร์ท Flask Backend:**
+```bash
+# macOS/Linux
+./restart-flask.sh
+
+# Windows
+restart-flask.bat
+```
+
+### **รีสตาร์ท Next.js Frontend:**
+```bash
+# กด Ctrl+C ใน terminal ที่รัน npm run dev
+# แล้วรันใหม่
+npm run dev
+```
+
+### **รีสตาร์ททั้งระบบ:**
+```bash
+# macOS/Linux
+./start-dev.sh
+
+# Windows
+start-dev.bat
+```
+
+## 📊 **การทดสอบ**
+
+### **ทดสอบ API Endpoints:**
+```bash
+# ทดสอบ Flask backend
 curl -X POST http://localhost:5000/predict \
   -H "Content-Type: application/json" \
   -d '{"input": [0.1, 0.2, ...]}'
+
+# ทดสอบ data endpoint
+curl http://localhost:5000/data/csv/c0.csv
 ```
 
-### **Test Next.js Frontend:**
+### **ทดสอบ Frontend:**
 ```bash
-# Start development server
-npm run dev
-
-# Open browser
-open http://localhost:3000
+# เปิดเบราว์เซอร์ไปที่ http://localhost:3000
+# ทดสอบการโหลด sample data
+# ทดสอบการอัปโหลดไฟล์ CSV
 ```
 
-## **🔧 Common Issues**
+## 🚀 **การ Deploy**
 
-### **1. CORS Issues**
-```python
-# ใน Flask app.py
-from flask_cors import CORS
-CORS(app)
-```
-
-### **2. Model Loading Issues**
-```python
-# ตรวจสอบ model path
-MODEL_PATH = os.path.join(os.path.dirname(__file__), '../model/model.h5')
-print(f"Model path: {MODEL_PATH}")
-print(f"Model exists: {os.path.exists(MODEL_PATH)}")
-```
-
-### **3. CSV Loading Issues**
-```python
-# ตรวจสอบ CSV path
-csv_path = os.path.join('../data', path)
-print(f"CSV path: {csv_path}")
-print(f"CSV exists: {os.path.exists(csv_path)}")
-```
-
-## **🚀 Production Deployment**
-
-### **Build Next.js:**
+### **Development:**
 ```bash
+# เริ่มต้นเซิร์ฟเวอร์พัฒนา
+./start-dev.sh  # macOS/Linux
+start-dev.bat   # Windows
+```
+
+### **Production:**
+```bash
+# สร้าง production build
 npm run build
+
+# เริ่มต้น production server
 npm start
 ```
 
-### **Deploy Flask:**
-```bash
-# ใช้ gunicorn
-pip install gunicorn
-gunicorn -w 4 -b 0.0.0.0:5000 app:app
+## 📝 **การเพิ่มฟีเจอร์ใหม่**
+
+### **1. เพิ่ม API Endpoint:**
+```python
+# ใน server/app.py
+@app.route('/new_endpoint', methods=['POST'])
+def new_endpoint():
+    # โค้ดใหม่
+    return jsonify({'result': 'success'})
 ```
 
-## **📝 Logs**
-
-### **Flask Logs:**
-```bash
-# ดู Flask logs
-tail -f server/app.py
+### **2. เพิ่ม Frontend Component:**
+```typescript
+// ใน src/components/NewComponent.tsx
+export default function NewComponent() {
+    // โค้ดใหม่
+    return <div>New Component</div>
+}
 ```
 
-### **Next.js Logs:**
+### **3. เพิ่มหน้าใหม่:**
+```typescript
+// ใน src/app/new-page/page.tsx
+export default function NewPage() {
+    // โค้ดใหม่
+    return <div>New Page</div>
+}
+```
+
+## 🔧 **การตั้งค่า Environment**
+
+### **Environment Variables:**
 ```bash
-# ดู Next.js logs
+# สร้างไฟล์ .env.local
+NEXT_PUBLIC_API_URL=http://localhost:5000
+```
+
+### **Python Environment:**
+```bash
+# สร้าง virtual environment
+python3 -m venv venv
+
+# เปิดใช้งาน
+source venv/bin/activate  # macOS/Linux
+venv\Scripts\activate     # Windows
+
+# ติดตั้ง dependencies
+pip install -r requirements.txt
+```
+
+### **Node.js Environment:**
+```bash
+# ติดตั้ง dependencies
+npm install
+
+# เริ่มต้น development server
 npm run dev
 ```
 
-## **🎯 Performance Tips**
+## 📚 **แหล่งข้อมูลเพิ่มเติม**
 
-1. **Flask Backend:**
-   - ใช้ `gunicorn` สำหรับ production
-   - เปิด `debug=False` ใน production
-   - ใช้ caching สำหรับ model predictions
-
-2. **Next.js Frontend:**
-   - ใช้ `npm run build` สำหรับ production
-   - เปิด compression
-   - ใช้ CDN สำหรับ static files
-
-## **🔒 Security**
-
-1. **API Security:**
-   - ใช้ HTTPS ใน production
-   - เปิด CORS เฉพาะ domain ที่จำเป็น
-   - Validate input data
-
-2. **Data Privacy:**
-   - ไม่เก็บ personal data
-   - ใช้ local storage เฉพาะที่จำเป็น
-   - Clear data เมื่อ logout
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Flask Documentation](https://flask.palletsprojects.com/)
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- [Chart.js Documentation](https://www.chartjs.org/docs/)
 
 ---
 
-**Happy Coding! 🚀** 
+**สร้างด้วย ❤️ สำหรับระบบจำแนกประเภทคลื่นไฟฟ้าหัวใจ** 

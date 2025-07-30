@@ -9,6 +9,7 @@ import io
 import base64
 import csv
 from datetime import datetime
+# pip install flask flask-cors numpy keras matplotlib pandas tensorflow-macos
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -17,15 +18,6 @@ matplotlib.use('Agg')
 
 MODEL_PATH = os.path.join(os.path.dirname(__file__), '../model/model.h5')
 model = keras.models.load_model(MODEL_PATH)
-# model = None
-
-@app.route('/')
-def index():
-    return send_from_directory('../public', 'index.html')
-
-@app.route('/<path:path>')
-def static_proxy(path):
-    return send_from_directory('../public', path)
 
 @app.route('/data/<path:path>')
 def data_proxy(path):
@@ -45,12 +37,7 @@ def predict():
         input_array = input_array.reshape(1, -1, 1)
 
     prediction = model.predict(input_array)
-    # print("value", prediction)
     result = prediction.tolist()
-    # result = None
-    
-    if model is None:
-        return jsonify({'error': 'Model not loaded'}), 400
         
     class_labels = [
         'Class 0 : Normal',
@@ -248,5 +235,4 @@ def dashboard_delete_row():
     return jsonify({'success': deleted})
 
 if __name__ == '__main__':
-    app.run(debug=True)
-    # app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000)
