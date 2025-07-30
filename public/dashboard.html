@@ -7,83 +7,270 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        body {
+            background: linear-gradient(135deg, #f8faff 0%, #e3f2fd 50%, #bbdefb 100%);
+        }
         .dashboard-container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 48px auto 0 auto;
-            background: #fff;
-            border-radius: 18px;
-            box-shadow: 0 4px 24px rgba(44, 62, 80, 0.10);
-            padding: 36px 28px 28px 28px;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(52, 152, 219, 0.12);
+            padding: 40px 32px 32px 32px;
+            border: 1px solid rgba(52, 152, 219, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .dashboard-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(52, 152, 219, 0.18);
         }
         .dashboard-title {
             text-align: center;
-            color: #2d3a4b;
-            margin-bottom: 28px;
+            color: #1a365d;
+            margin-bottom: 32px;
             font-weight: 700;
-            font-size: 2rem;
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInDown 0.8s ease;
+        }
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         .chart-section {
             margin-bottom: 40px;
+            background: linear-gradient(135deg, #f8faff 0%, #f0f9ff 100%);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .chart-section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.12);
+        }
+        .chart-section h2 {
+            color: #1e40af;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
         }
         .summary-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 24px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
         }
         .summary-table th, .summary-table td {
-            border: 1px solid #b2bec3;
-            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            padding: 12px 16px;
             text-align: center;
+            transition: background-color 0.3s ease;
         }
         .summary-table th {
-            background: #eaf6ff;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .summary-table tr:nth-child(even) {
+            background: #f8faff;
+        }
+        .summary-table tr:hover {
+            background: #f0f9ff;
         }
         .filter-bar {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 16px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            align-items: center;
+            margin-bottom: 32px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.08);
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
         .filter-bar label {
-            font-weight: 500;
-            margin-right: 4px;
+            font-weight: 600;
+            color: #1e40af;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .filter-bar select, .filter-bar input[type="text"], .filter-bar input[type="date"] {
-            padding: 4px 10px;
-            border-radius: 5px;
-            border: 1px solid #b2bec3;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 2px solid #dbeafe;
             font-size: 1rem;
+            background: #ffffff;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        .filter-bar select:focus, .filter-bar input[type="text"]:focus, .filter-bar input[type="date"]:focus {
+            border-color: #3b82f6;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .filter-actions {
+            display: flex;
+            gap: 12px;
+            align-items: end;
+        }
+        .clear-filter-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        .clear-filter-btn:hover {
+            background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(107, 114, 128, 0.3);
+        }
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .show-graph-btn, .edit-btn, .delete-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 80px;
+            text-align: center;
         }
         .show-graph-btn {
-            padding: 5px 14px;
-            background: #3498db;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.98rem;
-            transition: background 0.2s;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: #ffffff;
         }
         .show-graph-btn:hover {
-            background: #217dbb;
+            background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+        }
+        .edit-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+        }
+        .edit-btn:hover {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+        }
+        .delete-btn {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #ffffff;
+        }
+        .delete-btn:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
         }
         .ecg-row-graph {
-            background: #f8fafd;
-            border-bottom: 1px solid #b2bec3;
+            background: linear-gradient(135deg, #f8faff 0%, #f0f9ff 100%);
+            border-bottom: 1px solid #dbeafe;
         }
         .close-graph-btn {
             margin: 8px 0 0 0;
-            padding: 4px 16px;
-            background: #e74c3c;
-            color: #fff;
+            padding: 6px 16px;
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            color: #ffffff;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
         }
         .close-graph-btn:hover {
-            background: #c0392b;
+            background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
+            transform: translateY(-1px);
+        }
+        .save-edit-btn, .cancel-edit-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 0 2px;
+        }
+        .save-edit-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+        }
+        .save-edit-btn:hover {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            transform: translateY(-1px);
+        }
+        .cancel-edit-btn {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            color: #ffffff;
+        }
+        .cancel-edit-btn:hover {
+            background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
+            transform: translateY(-1px);
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 24px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.25);
+        }
+        .back-link:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35);
+        }
+        @media (max-width: 768px) {
+            .dashboard-container {
+                margin: 24px auto 0 auto;
+                padding: 24px 20px 20px 20px;
+            }
+            .dashboard-title {
+                font-size: 1.8rem;
+            }
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-bar > * {
+                margin-bottom: 8px;
+            }
         }
     </style>
 </head>
@@ -91,19 +278,27 @@
     <div class="dashboard-container">
         <div class="dashboard-title">ECG Arrhythmia Classification Dashboard</div>
         <div class="filter-bar">
-            <label for="filterClass">Class:</label>
-            <select id="filterClass">
-                <option value="">All</option>
-                <option value="0">Class 0: Normal</option>
-                <option value="1">Class 1: Supraventricular Premature Beat</option>
-                <option value="2">Class 2: Premature Ventricular Contraction</option>
-                <option value="3">Class 3: Unclassifiable Beat</option>
-            </select>
-            <label for="filterSearch">Search:</label>
-            <input type="text" id="filterSearch" placeholder="Search timestamp...">
-            <label for="filterDate">Date:</label>
-            <input type="date" id="filterDate">
-            <button id="clearFilterBtn" class="show-graph-btn" style="background:#95a5a6;">Clear</button>
+            <div class="filter-group">
+                <label for="filterClass">Class:</label>
+                <select id="filterClass">
+                    <option value="">All</option>
+                    <option value="0">Class 0: Normal</option>
+                    <option value="1">Class 1: Supraventricular Premature Beat</option>
+                    <option value="2">Class 2: Premature Ventricular Contraction</option>
+                    <option value="3">Class 3: Unclassifiable Beat</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filterSearch">Search:</label>
+                <input type="text" id="filterSearch" placeholder="Search timestamp...">
+            </div>
+            <div class="filter-group">
+                <label for="filterDate">Date:</label>
+                <input type="date" id="filterDate">
+            </div>
+            <div class="filter-actions">
+                <button id="clearFilterBtn" class="clear-filter-btn">Clear</button>
+            </div>
         </div>
         <div class="chart-section">
             <h2>Model Prediction (Count per Class)</h2>
@@ -128,7 +323,7 @@
                 <tbody></tbody>
             </table>
         </div>
-        <a href="index.html">&larr; Back to main page</a>
+        <a href="index.html" class="back-link">&larr; Back to main page</a>
     </div>
     <script>
     let allData = [];
@@ -164,10 +359,26 @@
                 datasets: [{
                     label: 'Model Prediction',
                     data: modelCounts,
-                    backgroundColor: ['#3498db','#f1c40f','#e67e22','#7f8c8d']
+                    backgroundColor: ['#3b82f6','#f59e0b','#ef4444','#6b7280']
                 }]
             },
-            options: {responsive:true, plugins:{legend:{display:false}}}
+            options: {
+                responsive:true, 
+                plugins:{legend:{display:false}},
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(59, 130, 246, 0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(59, 130, 246, 0.1)'
+                        }
+                    }
+                }
+            }
         });
         window.doctorChartInstance = new Chart(document.getElementById('doctorChart').getContext('2d'), {
             type: 'bar',
@@ -176,10 +387,26 @@
                 datasets: [{
                     label: 'Doctor Confirmation',
                     data: doctorCounts,
-                    backgroundColor: ['#27ae60','#f39c12','#e74c3c','#95a5a6']
+                    backgroundColor: ['#10b981','#f59e0b','#ef4444','#6b7280']
                 }]
             },
-            options: {responsive:true, plugins:{legend:{display:false}}}
+            options: {
+                responsive:true, 
+                plugins:{legend:{display:false}},
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(16, 185, 129, 0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(16, 185, 129, 0.1)'
+                        }
+                    }
+                }
+            }
         });
     }
     function filterData() {
@@ -199,7 +426,7 @@
         tbody.innerHTML = '';
         data.forEach((row, i) => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${i+1}</td><td>${row.timestamp}</td><td>${classLabel(row.model_class)}</td><td>${classLabel(row.doctor_class)}</td><td><button class='show-graph-btn' data-row='${i}'>Show Graph</button> <button class='edit-btn' data-row='${i}'>Edit</button> <button class='delete-btn' data-row='${i}'>Delete</button></td>`;
+            tr.innerHTML = `<td>${i+1}</td><td>${row.timestamp}</td><td>${classLabel(row.model_class)}</td><td>${classLabel(row.doctor_class)}</td><td><div class="action-buttons"><button class='show-graph-btn' data-row='${i}'>Graph</button><button class='edit-btn' data-row='${i}'>Edit</button><button class='delete-btn' data-row='${i}'>Delete</button></div></td>`;
             tbody.appendChild(tr);
             // Row for graph (hidden by default)
             const graphTr = document.createElement('tr');
@@ -252,8 +479,8 @@
                         datasets: [{
                             label: 'ECG Value',
                             data: rowData.input_data,
-                            borderColor: '#e67e22',
-                            backgroundColor: 'rgba(230,126,34,0.08)',
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
                             pointRadius: 0,
                             borderWidth: 2,
                             fill: true
@@ -262,7 +489,12 @@
                     options: {
                         responsive:true,
                         plugins:{legend:{display:false}},
-                        scales:{x:{display:false}}
+                        scales:{x:{display:false}},
+                        elements: {
+                            point: {
+                                radius: 0
+                            }
+                        }
                     }
                 });
             }
