@@ -6,97 +6,152 @@ import FloatingButton from '@/components/FloatingButton'
 export default function LicensePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="card p-8"
         >
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
-              License Agreement
+          <div className="text-center mb-12">
+            <h1 className="text-5xl font-bold text-blue-800 mb-4">
+              ข้อตกลงในการใช้ซอฟต์แวร์
             </h1>
-            <p className="text-gray-600 text-lg">
+            <p className="text-gray-600 text-xl font-medium">
               ECG Arrhythmia Classification System
             </p>
           </div>
 
-          {/* License Content */}
+          {/* License Content - 2 Blocks */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="space-y-6"
+            className="grid grid-cols-1 lg:grid-cols-2 gap-8"
           >
-            <div className="bg-blue-50 rounded-2xl p-6 border border-blue-200">
-              <h2 className="text-2xl font-semibold text-blue-800 mb-4">MIT License</h2>
-              <p className="text-blue-700 mb-4">
-                Copyright (c) 2024 ECG Arrhythmia Classification System
-              </p>
-              <p className="text-blue-700">
-                Permission is hereby granted, free of charge, to any person obtaining a copy
-                of this software and associated documentation files (the "Software"), to deal
-                in the Software without restriction, including without limitation the rights
-                to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-                copies of the Software, and to permit persons to whom the Software is
-                furnished to do so, subject to the following conditions:
-              </p>
-            </div>
-
-            <div className="bg-green-50 rounded-2xl p-6 border border-green-200">
-              <h3 className="text-xl font-semibold text-green-800 mb-4">Terms of Use</h3>
-              <ul className="text-green-700 space-y-2">
-                <li>• This system is for educational and research purposes only</li>
-                <li>• Medical decisions should not be based solely on AI predictions</li>
-                <li>• Always consult with qualified healthcare professionals</li>
-                <li>• The system is provided "as is" without warranty</li>
-                <li>• Users are responsible for their own medical decisions</li>
-              </ul>
-            </div>
-
-            <div className="bg-yellow-50 rounded-2xl p-6 border border-yellow-200">
-              <h3 className="text-xl font-semibold text-yellow-800 mb-4">Disclaimer</h3>
-              <p className="text-yellow-700">
-                This ECG classification system is designed for educational and research purposes. 
-                It should not be used as a substitute for professional medical advice, diagnosis, 
-                or treatment. Always seek the advice of qualified healthcare providers with questions 
-                you may have regarding medical conditions.
-              </p>
-            </div>
-
-            <div className="bg-purple-50 rounded-2xl p-6 border border-purple-200">
-              <h3 className="text-xl font-semibold text-purple-800 mb-4">Privacy Policy</h3>
-              <p className="text-purple-700">
-                This system processes ECG data for classification purposes. All data is processed 
-                locally and no personal information is stored or transmitted. The system does not 
-                collect, store, or share any personal medical information.
-              </p>
-            </div>
-
-            <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Contact Information</h3>
-              <p className="text-gray-700">
-                For questions about this license or the ECG classification system, please contact:
-              </p>
-              <div className="mt-4 space-y-2 text-gray-700">
-                <p><strong>Email:</strong> support@ecg-classification.com</p>
-                <p><strong>Website:</strong> https://ecg-classification.com</p>
-                <p><strong>Version:</strong> 1.0.0</p>
+            {/* Thai Block */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-8 border-2 border-blue-200 shadow-lg"
+            >
+              <div className="text-center mb-6">
+                <h2 className="text-3xl font-bold text-blue-800 mb-2">
+                  ภาษาไทย
+                </h2>
+                <div className="w-16 h-1 bg-blue-600 mx-auto rounded-full"></div>
               </div>
-            </div>
+              
+              <div className="prose prose-lg max-w-none">
+                <div className="space-y-6 text-blue-900 leading-relaxed">
+                  <p className="text-lg font-medium leading-8">
+                    ซอฟต์แวร์นี้เป็นผลงานที่พัฒนาขึ้นโดย นายกิตติธัช ทิพย์มณฑา, นายภูธน เกษรสิทธิ์ และนายรณกร แก้วกียูร 
+                    จากโรงเรียนเบญจมราชูทิศ ภายใต้การดูแลของคุณครูเอกตวัน เลิศไกร
+                  </p>
+                  
+                  <p className="text-lg leading-8">
+                    ภายใต้โครงการ การวิเคราะห์ภาวะหัวใจเต้นผิดจังหวะจากสัญญาณคลื่นไฟฟ้าหัวใจโดยใช้สถาปัตยกรรมโครงข่ายประสาทเทียมแบบผสมผสาน
+                    ระหว่างคอนโวลูชันและหน่วยความจำระยะสั้นแบบยาว ซึ่งได้รับการสนับสนุนจากสำนักงานพัฒนาวิทยาศาสตร์และเทคโนโลยีแห่งชาติ
+                  </p>
+                  
+                  <p className="text-lg leading-8">
+                    โดยมีวัตถุประสงค์เพื่อส่งเสริมให้นักเรียนและนักศึกษาได้เรียนรู้และฝึกทักษะในการพัฒนาซอฟต์แวร์
+                  </p>
+                  
+                  <p className="text-lg leading-8">
+                    ลิขสิทธิ์ของซอฟต์แวร์นี้จึงเป็นของผู้พัฒนา โดยผู้พัฒนาได้อนุญาตให้สำนักงานพัฒนาวิทยาศาสตร์และเทคโนโลยีแห่งชาติ
+                    เผยแพร่ซอฟต์แวร์นี้ตาม "ต้นฉบับ" โดยไม่มีการแก้ไขดัดแปลงใด ๆ ทั้งสิ้น
+                  </p>
+                  
+                  <p className="text-lg leading-8">
+                    ให้แก่บุคคลทั่วไปเพื่อใช้สำหรับประโยชน์ส่วนบุคคลหรือประโยชน์ทางการศึกษาที่ไม่มีวัตถุประสงค์เชิงพาณิชย์ 
+                    โดยไม่คิดค่าตอบแทนการใช้ซอฟต์แวร์
+                  </p>
+                  
+                  <p className="text-lg leading-8">
+                    สำนักงานพัฒนาวิทยาศาสตร์และเทคโนโลยีแห่งชาติจึงไม่มีหน้าที่ในการดูแล บำรุงรักษา จัดการอบรมการใช้งาน 
+                    หรือพัฒนาประสิทธิภาพซอฟต์แวร์ รวมทั้งไม่รับรองความถูกต้องหรือประสิทธิภาพการทำงานของซอฟต์แวร์ 
+                    ตลอดจนไม่รับประกันความเสียหายต่าง ๆ อันเกิดจากการใช้ซอฟต์แวร์นี้ทั้งสิ้น
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* English Block */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+              className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-3xl p-8 border-2 border-indigo-200 shadow-lg"
+            >
+              <div className="text-center mb-6">
+                <h2 className="text-3xl font-bold text-indigo-800 mb-2">
+                  English
+                </h2>
+                <div className="w-16 h-1 bg-indigo-600 mx-auto rounded-full"></div>
+              </div>
+              
+              <div className="prose prose-lg max-w-none">
+                <div className="space-y-6 text-indigo-900 leading-relaxed">
+                  <p className="text-lg font-medium leading-8">
+                    This software is a work developed by Mr.Kittitouch Thipmontha, Mr.Putana Kesornsit and Mr.Ronnakorn Kaewkeeyoon 
+                    from Benjamarachutit school under the provision of Mr.Aktawun Lertkrai
+                  </p>
+                  
+                  <p className="text-lg leading-8">
+                    under Analysis of Cardiac Arrhythmia from Electrocardiogram Signals Using Hybrid Convolutional Neural Network (CNN) 
+                    and Long Short-Term Memory (LSTM) Architectures which has been supported by the National Science and Technology 
+                    Development Agency (NSTDA)
+                  </p>
+                  
+                  <p className="text-lg leading-8">
+                    in order to encourage pupils and students to learn and practice their skills in developing software
+                  </p>
+                  
+                  <p className="text-lg leading-8">
+                    Therefore, the intellectual property of this software shall belong to the developer and the developer gives NSTDA 
+                    permission to distribute this software as an "as is" and non-modified software
+                  </p>
+                  
+                  <p className="text-lg leading-8">
+                    for temporary and non-exclusive use without remuneration to anyone for their own purpose or academic purposes, 
+                    which are not commercial purposes
+                  </p>
+                  
+                  <p className="text-lg leading-8">
+                    In this connection, NSTDA shall not be responsible to the user for taking care, maintaining, training, 
+                    or developing the efficiency of this software. Moreover, NSTDA shall not be liable for any error, 
+                    software efficiency, and damages in connection with or arising out of the use of the software
+                  </p>
+                </div>
+              </div>
+            </motion.div>
           </motion.div>
 
           {/* Footer */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-center mt-8 pt-6 border-t border-gray-200"
+            transition={{ delay: 0.4 }}
+            className="text-center mt-12 pt-8 border-t border-gray-200"
           >
-            <p className="text-gray-600">
-              © 2024 ECG Arrhythmia Classification System. All rights reserved.
-            </p>
+            <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-6 border border-gray-200">
+              <h3 className="text-2xl font-semibold text-gray-800 mb-4">ข้อมูลติดต่อ</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+                <div className="space-y-2">
+                  <p><strong>โรงเรียน:</strong> โรงเรียนเบญจมราชูทิศ</p>
+                  <p><strong>อาจารย์ที่ปรึกษา:</strong> คุณครูเอกตวัน เลิศไกร</p>
+                  <p><strong>ผู้พัฒนา:</strong> นายกิตติธัช ทิพย์มณฑา, นายภูธน เกษรสิทธิ์, นายรณกร แก้วกียูร</p>
+                </div>
+                <div className="space-y-2">
+                  <p><strong>องค์กรสนับสนุน:</strong> สำนักงานพัฒนาวิทยาศาสตร์และเทคโนโลยีแห่งชาติ (NSTDA)</p>
+                  <p><strong>เวอร์ชัน:</strong> 1.0.0</p>
+                  <p><strong>ปี:</strong> 2025</p>
+                </div>
+              </div>
+            </div>
+            
           </motion.div>
         </motion.div>
       </div>
