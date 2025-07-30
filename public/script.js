@@ -163,6 +163,17 @@ predictBtn.addEventListener('click', async () => {
       const maxIdx = pred.class_index;
       const percent = (pred.probabilities[maxIdx] * 100).toFixed(2) + '%';
       let html = `<b>Prediction:</b> ${pred.label}<br/><b>Probability:</b> <b>${percent}</b>`;
+      // เพิ่มปุ่ม More Information เฉพาะ class 0,1,2
+      if (maxIdx === 0 || maxIdx === 1 || maxIdx === 2) {
+        const infoPages = ['class0.html', 'class1.html', 'class2.html'];
+        html += `<br><button id="moreInfoBtn" style="margin-top:10px;padding:8px 18px;font-size:1rem;background:#007bff;color:#fff;border:none;border-radius:6px;cursor:pointer;">More Information</button>`;
+        setTimeout(() => {
+          const btn = document.getElementById('moreInfoBtn');
+          if (btn) {
+            btn.onclick = () => window.open(infoPages[maxIdx], '_blank');
+          }
+        }, 0);
+      }
       showResult(html);
       
       // Show doctor classification section
@@ -230,4 +241,26 @@ async function loadSampleFromCSV(csvPath, rowNum) {
 
 hideResult();
 hideDoctorClassification();
+
+// Info icon click handlers
+document.querySelectorAll('.info-icon').forEach(icon => {
+  icon.addEventListener('click', (e) => {
+    e.stopPropagation(); // Prevent button click
+    const classNum = icon.getAttribute('data-class');
+    openClassInfo(classNum);
+  });
+});
+
+// Function to open class information
+function openClassInfo(classNum) {
+  const classInfo = {
+    '0': 'class0.html',
+    '1': 'class1.html',
+    '2': 'class2.html'
+  };
+  const page = classInfo[classNum];
+  if (page) {
+    window.open(page, '_blank');
+  }
+}
 
