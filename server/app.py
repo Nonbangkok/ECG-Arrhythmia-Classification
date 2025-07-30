@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS
 import numpy as np
 import keras
 import os
@@ -10,6 +11,7 @@ import csv
 from datetime import datetime
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 matplotlib.use('Agg')
 
@@ -246,5 +248,5 @@ def dashboard_delete_row():
     return jsonify({'success': deleted})
 
 if __name__ == '__main__':
-    # app.run(debug=True)
-    app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True)
+    # app.run(host='0.0.0.0', port=5000)
