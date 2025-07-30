@@ -41,7 +41,7 @@ def predict():
         input_array = input_array.reshape(1, -1, 1)
 
     prediction = model.predict(input_array)
-    print("value", prediction)
+    # print("value", prediction)
     result = prediction.tolist()
     # result = None
     
@@ -88,4 +88,5 @@ def plot_ecg():
     return jsonify({'image': img_uri})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)
