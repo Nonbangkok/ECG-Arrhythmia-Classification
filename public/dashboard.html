@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - ECG Arrhythmia Classification</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dashboard-container {
+            max-width: 900px;
+            margin: 48px auto 0 auto;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(44, 62, 80, 0.10);
+            padding: 36px 28px 28px 28px;
+        }
+        .dashboard-title {
+            text-align: center;
+            color: #2d3a4b;
+            margin-bottom: 28px;
+            font-weight: 700;
+            font-size: 2rem;
+        }
+        .chart-section {
+            margin-bottom: 40px;
+        }
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 24px;
+        }
+        .summary-table th, .summary-table td {
+            border: 1px solid #b2bec3;
+            padding: 8px 12px;
+            text-align: center;
+        }
+        .summary-table th {
+            background: #eaf6ff;
+        }
+        .filter-bar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-bar label {
+            font-weight: 500;
+            margin-right: 4px;
+        }
+        .filter-bar select, .filter-bar input[type="text"], .filter-bar input[type="date"] {
+            padding: 4px 10px;
+            border-radius: 5px;
+            border: 1px solid #b2bec3;
+            font-size: 1rem;
+        }
+        .show-graph-btn {
+            padding: 5px 14px;
+            background: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.98rem;
+            transition: background 0.2s;
+        }
+        .show-graph-btn:hover {
+            background: #217dbb;
+        }
+        .ecg-row-graph {
+            background: #f8fafd;
+            border-bottom: 1px solid #b2bec3;
+        }
+        .close-graph-btn {
+            margin: 8px 0 0 0;
+            padding: 4px 16px;
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+        .close-graph-btn:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-title">ECG Arrhythmia Classification Dashboard</div>
+        <div class="filter-bar">
+            <label for="filterClass">Class:</label>
+            <select id="filterClass">
+                <option value="">All</option>
+                <option value="0">Class 0: Normal</option>
+                <option value="1">Class 1: Supraventricular Premature Beat</option>
+                <option value="2">Class 2: Premature Ventricular Contraction</option>
+                <option value="3">Class 3: Unclassifiable Beat</option>
+            </select>
+            <label for="filterSearch">Search:</label>
+            <input type="text" id="filterSearch" placeholder="Search timestamp...">
+            <label for="filterDate">Date:</label>
+            <input type="date" id="filterDate">
+            <button id="clearFilterBtn" class="show-graph-btn" style="background:#95a5a6;">Clear</button>
+        </div>
+        <div class="chart-section">
+            <h2>Model Prediction (Count per Class)</h2>
+            <canvas id="modelChart" height="120"></canvas>
+        </div>
+        <div class="chart-section">
+            <h2>Doctor Confirmation (Count per Class)</h2>
+            <canvas id="doctorChart" height="120"></canvas>
+        </div>
+        <div class="chart-section">
+            <h2>Summary Table</h2>
+            <table class="summary-table" id="summaryTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Timestamp</th>
+                        <th>Model Prediction</th>
+                        <th>Doctor Confirmation</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <a href="index.html">&larr; Back to main page</a>
+    </div>
+    <script>
+    let allData = [];
+    let filteredData = [];
+    let expandedRow = null;
+    let chartInstances = {};
+    async function fetchData() {
+        const res = await fetch('/dashboard_data');
+        return await res.json();
+    }
+    function classLabel(idx) {
+        return [
+            'Class 0: Normal',
+            'Class 1: Supraventricular Premature Beat',
+            'Class 2: Premature Ventricular Contraction',
+            'Class 3: Unclassifiable Beat'
+        ][idx] || 'Unknown';
+    }
+    function renderCharts(data) {
+        // Model Prediction Chart
+        const modelCounts = [0,0,0,0];
+        const doctorCounts = [0,0,0,0];
+        data.forEach(row => {
+            if (row.model_class >= 0 && row.model_class < 4) modelCounts[row.model_class]++;
+            if (row.doctor_class >= 0 && row.doctor_class < 4) doctorCounts[row.doctor_class]++;
+        });
+        if(window.modelChartInstance) window.modelChartInstance.destroy();
+        if(window.doctorChartInstance) window.doctorChartInstance.destroy();
+        window.modelChartInstance = new Chart(document.getElementById('modelChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: [classLabel(0), classLabel(1), classLabel(2), classLabel(3)],
+                datasets: [{
+                    label: 'Model Prediction',
+                    data: modelCounts,
+                    backgroundColor: ['#3498db','#f1c40f','#e67e22','#7f8c8d']
+                }]
+            },
+            options: {responsive:true, plugins:{legend:{display:false}}}
+        });
+        window.doctorChartInstance = new Chart(document.getElementById('doctorChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: [classLabel(0), classLabel(1), classLabel(2), classLabel(3)],
+                datasets: [{
+                    label: 'Doctor Confirmation',
+                    data: doctorCounts,
+                    backgroundColor: ['#27ae60','#f39c12','#e74c3c','#95a5a6']
+                }]
+            },
+            options: {responsive:true, plugins:{legend:{display:false}}}
+        });
+    }
+    function filterData() {
+        const classVal = document.getElementById('filterClass').value;
+        const searchVal = document.getElementById('filterSearch').value.trim().toLowerCase();
+        const dateVal = document.getElementById('filterDate').value;
+        return allData.filter(row => {
+            let ok = true;
+            if(classVal !== '' && String(row.model_class) !== classVal && String(row.doctor_class) !== classVal) ok = false;
+            if(searchVal && !row.timestamp.toLowerCase().includes(searchVal)) ok = false;
+            if(dateVal && !row.timestamp.startsWith(dateVal)) ok = false;
+            return ok;
+        });
+    }
+    function renderTable(data) {
+        const tbody = document.querySelector('#summaryTable tbody');
+        tbody.innerHTML = '';
+        data.forEach((row, i) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${i+1}</td><td>${row.timestamp}</td><td>${classLabel(row.model_class)}</td><td>${classLabel(row.doctor_class)}</td><td><button class='show-graph-btn' data-row='${i}'>Show Graph</button></td>`;
+            tbody.appendChild(tr);
+            // Row for graph (hidden by default)
+            const graphTr = document.createElement('tr');
+            graphTr.className = 'ecg-row-graph';
+            graphTr.style.display = 'none';
+            graphTr.innerHTML = `<td colspan='5'><div style='max-width:700px;margin:0 auto;'><canvas id='ecgChart${i}' height='80'></canvas><br><button class='close-graph-btn'>Close</button></div></td>`;
+            tbody.appendChild(graphTr);
+        });
+        // Add event listeners for show/hide graph
+        document.querySelectorAll('.show-graph-btn').forEach(btn => {
+            btn.onclick = function() {
+                const idx = parseInt(btn.getAttribute('data-row'));
+                toggleGraphRow(idx, data[idx]);
+            };
+        });
+        document.querySelectorAll('.close-graph-btn').forEach((btn, idx) => {
+            btn.onclick = function() {
+                hideGraphRow(idx);
+            };
+        });
+    }
+    function toggleGraphRow(idx, rowData) {
+        // Hide previous expanded row
+        if(expandedRow !== null && expandedRow !== idx) hideGraphRow(expandedRow);
+        const tbody = document.querySelector('#summaryTable tbody');
+        const graphTr = tbody.children[idx*2+1];
+        if(graphTr.style.display === 'none') {
+            graphTr.style.display = '';
+            // Draw chart if not already
+            if(!chartInstances[idx]) {
+                chartInstances[idx] = new Chart(document.getElementById('ecgChart'+idx).getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: rowData.input_data.map((_,i)=>i+1),
+                        datasets: [{
+                            label: 'ECG Value',
+                            data: rowData.input_data,
+                            borderColor: '#e67e22',
+                            backgroundColor: 'rgba(230,126,34,0.08)',
+                            pointRadius: 0,
+                            borderWidth: 2,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive:true,
+                        plugins:{legend:{display:false}},
+                        scales:{x:{display:false}}
+                    }
+                });
+            }
+            expandedRow = idx;
+        } else {
+            hideGraphRow(idx);
+        }
+    }
+    function hideGraphRow(idx) {
+        const tbody = document.querySelector('#summaryTable tbody');
+        const graphTr = tbody.children[idx*2+1];
+        graphTr.style.display = 'none';
+        if(chartInstances[idx]) {
+            chartInstances[idx].destroy();
+            chartInstances[idx] = null;
+        }
+        if(expandedRow === idx) expandedRow = null;
+    }
+    document.getElementById('filterClass').onchange = document.getElementById('filterSearch').oninput = document.getElementById('filterDate').onchange = function() {
+        filteredData = filterData();
+        renderCharts(filteredData);
+        renderTable(filteredData);
+    };
+    document.getElementById('clearFilterBtn').onclick = function() {
+        document.getElementById('filterClass').value = '';
+        document.getElementById('filterSearch').value = '';
+        document.getElementById('filterDate').value = '';
+        filteredData = allData;
+        renderCharts(filteredData);
+        renderTable(filteredData);
+    };
+    fetchData().then(data => {
+        allData = data;
+        filteredData = data;
+        renderCharts(filteredData);
+        renderTable(filteredData);
+    });
+    </script>
+</body>
+</html> 
