@@ -178,6 +178,73 @@ def dashboard_data():
                     continue
     return jsonify(data)
 
+@app.route('/dashboard_update_row', methods=['POST'])
+def dashboard_update_row():
+    data = request.json
+    timestamp = data.get('timestamp')
+    input_data = data.get('input_data')
+    new_model_class = data.get('model_class')
+    new_doctor_class = data.get('doctor_class')
+    database_dir = os.path.join(os.path.dirname(__file__), '../database')
+    csv_file = os.path.join(database_dir, 'classifications.csv')
+    updated = False
+    rows = []
+    if os.path.exists(csv_file):
+        with open(csv_file, 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                # Match by timestamp+input_data
+                if (row['Timestamp'] == timestamp and row['Input_Data'] == ','.join(map(str, input_data))):
+                    row['Model_Prediction_Class'] = str(new_model_class)
+                    row['Model_Prediction_Label'] = [
+                        'Class 0 : Normal',
+                        'Class 1 : Supraventricular Premature Beat',
+                        'Class 2 : Premature Ventricular Contraction',
+                        'Class 3 : Unclassifiable Beat'
+                    ][int(new_model_class)]
+                    row['Doctor_Classification_Class'] = str(new_doctor_class)
+                    row['Doctor_Classification_Label'] = [
+                        'Class 0 : Normal',
+                        'Class 1 : Supraventricular Premature Beat',
+                        'Class 2 : Premature Ventricular Contraction',
+                        'Class 3 : Unclassifiable Beat'
+                    ][int(new_doctor_class)]
+                    updated = True
+                rows.append(row)
+        # Write back
+        if updated:
+            with open(csv_file, 'w', encoding='utf-8', newline='') as f:
+                writer = csv.DictWriter(f, fieldnames=rows[0].keys())
+                writer.writeheader()
+                writer.writerows(rows)
+    return jsonify({'success': updated})
+
+@app.route('/dashboard_delete_row', methods=['POST'])
+def dashboard_delete_row():
+    data = request.json
+    timestamp = data.get('timestamp')
+    input_data = data.get('input_data')
+    database_dir = os.path.join(os.path.dirname(__file__), '../database')
+    csv_file = os.path.join(database_dir, 'classifications.csv')
+    deleted = False
+    rows = []
+    if os.path.exists(csv_file):
+        with open(csv_file, 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                # Match by timestamp+input_data
+                if (row['Timestamp'] == timestamp and row['Input_Data'] == ','.join(map(str, input_data))):
+                    deleted = True
+                    continue
+                rows.append(row)
+        # Write back
+        if deleted:
+            with open(csv_file, 'w', encoding='utf-8', newline='') as f:
+                writer = csv.DictWriter(f, fieldnames=rows[0].keys())
+                writer.writeheader()
+                writer.writerows(rows)
+    return jsonify({'success': deleted})
+
 if __name__ == '__main__':
     # app.run(debug=True)
     app.run(host='0.0.0.0', port=5000)
