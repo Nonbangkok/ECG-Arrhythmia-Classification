@@ -157,6 +157,27 @@ def save_classification():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/dashboard_data')
+def dashboard_data():
+    database_dir = os.path.join(os.path.dirname(__file__), '../database')
+    csv_file = os.path.join(database_dir, 'classifications.csv')
+    data = []
+    if os.path.exists(csv_file):
+        with open(csv_file, 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                try:
+                    input_data = [float(x) for x in row['Input_Data'].split(',')]
+                    data.append({
+                        'timestamp': row['Timestamp'],
+                        'model_class': int(row['Model_Prediction_Class']),
+                        'doctor_class': int(row['Doctor_Classification_Class']),
+                        'input_data': input_data
+                    })
+                except Exception:
+                    continue
+    return jsonify(data)
+
 if __name__ == '__main__':
     # app.run(debug=True)
     app.run(host='0.0.0.0', port=5000)
